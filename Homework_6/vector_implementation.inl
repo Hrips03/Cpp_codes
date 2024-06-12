@@ -29,7 +29,7 @@ Vector<T> &Vector<T>::operator=(const Vector<T> &v)
         sizeOfVec = v.sizeOfVec;
         capOfVec = v.capOfVec;
 
-        data = new int[capOfVec];
+        data = new T[capOfVec];
         for (size_t i = 0; i < sizeOfVec; i++)
             data[i] = v.data[i];
     }
@@ -174,7 +174,7 @@ T &Vector<T>::back()
 template <typename T>
 void Vector<T>::resize(size_t newSize)
 {
-    size_t *temp = new size_t[newSize];
+    size_t *temp = new T[newSize];
     for (int i = 0; i < sizeOfVec; i++)
         temp[i] = data[i];
 
