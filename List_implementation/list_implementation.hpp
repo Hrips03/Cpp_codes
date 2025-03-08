@@ -7,7 +7,6 @@
 
 template<typename T>
 class DoublyLinkedList {
-
 	struct Node {
 		T data;
 		Node* prev = nullptr;
@@ -61,5 +60,5 @@ private:
 	Node* tail = nullptr;
 };
 
-#include "List.inl"
+#include "list_implementation.inl"
 
