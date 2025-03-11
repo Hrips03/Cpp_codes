@@ -20,6 +20,7 @@ public:
 
         T &operator*() const;
         Iterator &operator++();
+        Iterator operator++(int);
         Iterator operator==(const Iterator& other);
         bool operator!=(const Iterator &other) const;
     };

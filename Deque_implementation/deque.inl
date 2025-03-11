@@ -337,6 +337,14 @@ typename Deque<T, Allocator>::Iterator &Deque<T, Allocator>::Iterator::operator+
 }
 
 template <class T, class Allocator>
+typename Deque<T, Allocator>::Iterator Deque<T, Allocator>::Iterator::operator++(int)
+{
+    auto temp = *this;
+    this->operator++();
+    return temp;
+}
+
+template <class T, class Allocator>
 typename Deque<T, Allocator>::Iterator Deque<T, Allocator>::Iterator::operator==(const Iterator& other)
 {
     return !(*this != other);
