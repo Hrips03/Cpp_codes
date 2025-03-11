@@ -159,7 +159,6 @@ void Deque<T, Allocator>::print() const
 {
     for (size_t i = 0; i < m_size; i++)
         std::cout << (*this)[i] << " "; 
-    // 8 8 8 8 8 5
     std::cout << std::endl;
 }
 
@@ -319,4 +318,47 @@ void Deque<T, Allocator>::pop_front()
     }
 
     m_size--;
+}
+
+template <class T, class Allocator>
+T &Deque<T, Allocator>::Iterator::operator*() const
+{
+    return *curr;
+}
+
+template <class T, class Allocator>
+typename Deque<T, Allocator>::Iterator &Deque<T, Allocator>::Iterator::operator++()
+{
+    assert(curr);
+    if (!curr)
+        return *this;
+
+    ++curr;
+    return *this;
+}
+
+template <class T, class Allocator>
+typename Deque<T, Allocator>::Iterator Deque<T, Allocator>::Iterator::operator++(int)
+{
+    auto temp = *this;
+    this->operator++();
+    return temp;
+}
+
+template <class T, class Allocator>
+bool Deque<T, Allocator>::Iterator::operator!=(const Iterator &other) const
+{
+    return curr != other.curr;
+}
+
+template <class T, class Allocator>
+typename Deque<T, Allocator>::Iterator Deque<T, Allocator>::begin()
+{
+    return Iterator(data);
+}
+
+template <class T, class Allocator>
+typename Deque<T, Allocator>::Iterator Deque<T, Allocator>::end()
+{
+    return Iterator(data + sizeOfVec);
 }

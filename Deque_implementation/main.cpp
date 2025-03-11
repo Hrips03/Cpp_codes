@@ -126,7 +126,7 @@ int main()
     // back_index = 2
     // size = 7
 
-    // for (size_t i = 0; i < deque3.size(); i++)
-    //     std::cout << deque3[i] << " "; 
-    // std::cout << std::endl;
+    for (auto it = deque3.begin(); it != deque3.end(); it++)
+        std::cout << *it << " "; 
+    std::cout << std::endl;
 }
