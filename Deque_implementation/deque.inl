@@ -323,42 +323,39 @@ void Deque<T, Allocator>::pop_front()
 template <class T, class Allocator>
 T &Deque<T, Allocator>::Iterator::operator*() const
 {
-    return *curr;
+    return map[blockIdx][elemIdx];
 }
 
 template <class T, class Allocator>
 typename Deque<T, Allocator>::Iterator &Deque<T, Allocator>::Iterator::operator++()
 {
-    assert(curr);
-    if (!curr)
-        return *this;
-
-    ++curr;
+    if (++elemIdx == blockSize) { 
+        elemIdx = 0;
+        blockIdx++;
+    }
     return *this;
 }
 
 template <class T, class Allocator>
-typename Deque<T, Allocator>::Iterator Deque<T, Allocator>::Iterator::operator++(int)
+typename Deque<T, Allocator>::Iterator Deque<T, Allocator>::Iterator::operator==(const Iterator& other)
 {
-    auto temp = *this;
-    this->operator++();
-    return temp;
+    return !(*this != other);
 }
 
 template <class T, class Allocator>
 bool Deque<T, Allocator>::Iterator::operator!=(const Iterator &other) const
 {
-    return curr != other.curr;
+    return blockIdx != other.blockIdx || elemIdx != other.elemIdx;
 }
 
 template <class T, class Allocator>
 typename Deque<T, Allocator>::Iterator Deque<T, Allocator>::begin()
 {
-    return Iterator(data);
+    return Iterator(m_map, m_block_size, 0, m_front_index);
 }
 
 template <class T, class Allocator>
 typename Deque<T, Allocator>::Iterator Deque<T, Allocator>::end()
 {
-    return Iterator(data + sizeOfVec);
+    return Iterator(m_map, m_block_size, m_map_size - 1, m_back_index + 1);
 }

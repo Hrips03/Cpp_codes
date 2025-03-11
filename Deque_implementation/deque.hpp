@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <cassert>
 
 template <class T, class Allocator = std::allocator<T>>
 class Deque
@@ -7,13 +8,19 @@ class Deque
 public:
     class Iterator
     {
-        T *curr = nullptr;
+    private:
+        T **map; 
+        size_t blockSize;
+        size_t blockIdx;
+        size_t elemIdx;
+
     public:
-        Iterator(T *ptr) : curr(ptr) {}
+        Iterator(T **map, size_t blockSize, size_t blockIdx, size_t elemIdx)
+            : map(map), blockSize(blockSize), blockIdx(blockIdx), elemIdx(elemIdx) {}
 
         T &operator*() const;
         Iterator &operator++();
-        Iterator operator++(int);
+        Iterator operator==(const Iterator& other);
         bool operator!=(const Iterator &other) const;
     };
 
@@ -38,6 +45,7 @@ public:
 
     Iterator begin();
     Iterator end();
+
 private:
     T **m_map;
     size_t m_map_size = 0;
