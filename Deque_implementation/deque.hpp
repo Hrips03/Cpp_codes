@@ -23,6 +23,8 @@ public:
 
     size_t size();
     const T& operator[]( size_t pos) const;
+    void printMatrix() const;
+    void print() const;
     void push_back(const T& value);
     void push_back(T&& value);
     void pop_back();

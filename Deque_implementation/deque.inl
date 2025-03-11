@@ -23,15 +23,16 @@ Deque<T, Allocator>::Deque(size_t count, const T &value) : m_size(count)
     Allocator alloc;
     m_map_size = (count + m_block_size - 1) / m_block_size;
     m_map = new T *[m_map_size];
-
+    int counter = 0;
     for (size_t i = 0; i < m_map_size; ++i)
     {
         m_map[i] = std::allocator_traits<Allocator>::allocate(alloc, m_block_size);
         for (size_t j = 0; j < m_block_size; ++j)
         {
-            if (j > count)
+            if (counter == count)
                 break;
             std::allocator_traits<Allocator>::construct(alloc, &m_map[i][j], value);
+            counter++;
         }
     }
 
@@ -128,9 +129,38 @@ Deque<T, Allocator> &Deque<T, Allocator>::operator=(Deque<T, Allocator> &&other)
 template <class T, class Allocator>
 const T &Deque<T, Allocator>::operator[](size_t pos) const
 {
-    size_t block_index = pos / m_block_size;
-    size_t index = pos % m_block_size;
-    return m_map[block_index][index];
+    // size_t block_index = pos / m_block_size;
+    // size_t index = pos % m_block_size;
+    // return m_map[block_index][index];
+
+    size_t flatIdx = m_front_index + pos;
+    return m_map[flatIdx / m_block_size][flatIdx % m_block_size];
+}
+
+template <class T, class Allocator>
+void Deque<T, Allocator>::printMatrix() const
+{
+    std::cout << "m_map_size = " << m_map_size << std::endl;
+    std::cout << "m_front_index = " << m_front_index << std::endl;
+    std::cout << "m_back_index = " << m_back_index << std::endl;
+    std::cout << "m_size = " << m_size << std::endl;
+    for (size_t i = 0; i < m_map_size; ++i)
+    {
+        for (size_t j = 0; j < m_block_size; ++j)
+        {
+            std::cout << m_map[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+template <class T, class Allocator>
+void Deque<T, Allocator>::print() const
+{
+    for (size_t i = 0; i < m_size; i++)
+        std::cout << (*this)[i] << " "; 
+    // 8 8 8 8 8 5
+    std::cout << std::endl;
 }
 
 template <class T, class Allocator>
@@ -197,6 +227,7 @@ void Deque<T, Allocator>::pop_back()
     }
     else
     {
+        m_map[m_map_size - 1][m_back_index] = 0;
         m_back_index--;
     }
     m_size--;
@@ -214,25 +245,21 @@ void Deque<T, Allocator>::push_front(T &&value)
     else
     {
         T *new_block = std::allocator_traits<Allocator>::allocate(alloc, m_block_size);
-        std::allocator_traits<Allocator>::construct(alloc, &new_block[m_front_index], value);
+        std::allocator_traits<Allocator>::construct(alloc, &new_block[m_block_size - 1], value);
+
+        for (size_t i = 0; i < m_block_size - 1; i++)
+            std::allocator_traits<Allocator>::construct(alloc, &new_block[i], 0);
 
         for (size_t i = m_map_size; i > 0; --i)
-        {
             m_map[i] = m_map[i - 1];
-        }
 
         m_map[0] = new_block;
         m_map_size++;
 
-        m_front_index = 0;
+        m_front_index = m_block_size - 1;
     }
 
     m_size++;
-
-    std::cout << "m_map_size = " << m_map_size << std::endl;
-    std::cout << "m_front_index = " << m_front_index << std::endl;
-    std::cout << "m_back_index = " << m_back_index << std::endl;
-    std::cout << "m_size = " << m_size << std::endl;
 }
 
 template <class T, class Allocator>
@@ -246,19 +273,19 @@ void Deque<T, Allocator>::push_front(const T &value)
     }
     else
     {
-
         T *new_block = std::allocator_traits<Allocator>::allocate(alloc, m_block_size);
-        std::allocator_traits<Allocator>::construct(alloc, &new_block[m_front_index], value);
+        std::allocator_traits<Allocator>::construct(alloc, &new_block[m_block_size - 1], value);
+
+        for (size_t i = 0; i < m_block_size - 1; i++)
+            std::allocator_traits<Allocator>::construct(alloc, &new_block[i], 0);
 
         for (size_t i = m_map_size; i > 0; --i)
-        {
             m_map[i] = m_map[i - 1];
-        }
 
         m_map[0] = new_block;
         m_map_size++;
 
-        m_front_index = 0;
+        m_front_index = m_block_size - 1;
     }
 
     m_size++;
@@ -272,20 +299,24 @@ void Deque<T, Allocator>::pop_front()
 
     Allocator alloc;
     std::allocator_traits<Allocator>::destroy(alloc, &m_map[0][m_front_index]);
-    m_front_index++;
 
     if (m_front_index == m_block_size - 1)
     {
         std::allocator_traits<Allocator>::deallocate(alloc, m_map[0], m_block_size);
         m_map[0] = nullptr;
+
+        for (size_t i = 0; i < m_map_size - 1; i++)
+        {
+            m_map[i] = m_map[i + 1];
+        }
+        m_map[m_map_size - 1] = nullptr;
         m_map_size--;
         m_front_index = 0;
     }
-   
-    m_size--;
+    else
+    {
+        m_front_index++;
+    }
 
-    std::cout << "m_map_size = " << m_map_size << std::endl;
-    std::cout << "m_front_index = " << m_front_index << std::endl;
-    std::cout << "m_back_index = " << m_back_index << std::endl;
-    std::cout << "m_size = " << m_size << std::endl;
+    m_size--;
 }
